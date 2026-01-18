@@ -1,0 +1,835 @@
+meta:
+  version: "1.0.0"
+  updated: "2026-01-07"
+  sources:
+    - name: "abuse.ch URLhaus"
+      url: "https://urlhaus.abuse.ch"
+      description: "Malicious URLs and domains"
+    - name: "MITRE ATT&CK"
+      url: "https://attack.mitre.org"
+      description: "Adversary tactics and techniques"
+    - name: "Bandit"
+      url: "https://bandit.readthedocs.io"
+      description: "Python security linter patterns"
+    - name: "CIS Benchmarks"
+      url: "https://cisecurity.org"
+      description: "Linux security hardening"
+
+threat_scores:
+  setuid_root: 30
+  kernel_module: 25
+  ptrace_attach: 20
+  execve_suspicious: 15
+  dns_suspicious_tld: 15
+  telegram_api: 20
+  http_suspicious_ua: 15
+  write_etc: 25
+  write_bin: 25
+  hidden_file: 10
+  startup_modify: 20
+  subprocess_call: 10
+  socket_connect: 15
+  eval_exec: 15
+  shell_suspicious: 15
+
+verdict_thresholds:
+  clean: 29
+  suspicious: 69
+  malicious: 100
+
+syscalls:
+  privilege_escalation:
+    - syscall: "setuid"
+      score: 30
+      description: "Change user ID"
+    - syscall: "setgid"
+      score: 25
+      description: "Change group ID"
+    - syscall: "setreuid"
+      score: 30
+      description: "Set real and effective user ID"
+    - syscall: "setregid"
+      score: 25
+      description: "Set real and effective group ID"
+    - syscall: "setresuid"
+      score: 30
+      description: "Set real, effective and saved user ID"
+
+  kernel:
+    - syscall: "init_module"
+      score: 25
+      description: "Load kernel module"
+    - syscall: "finit_module"
+      score: 25
+      description: "Load kernel module from file descriptor"
+    - syscall: "delete_module"
+      score: 20
+      description: "Unload kernel module"
+
+  injection:
+    - syscall: "ptrace"
+      score: 20
+      description: "Process tracing (debugging/injection)"
+    - syscall: "process_vm_writev"
+      score: 20
+      description: "Write to another process memory"
+    - syscall: "process_vm_readv"
+      score: 15
+      description: "Read from another process memory"
+
+  execution:
+    - syscall: "execve"
+      score: 5
+      description: "Execute program"
+    - syscall: "execveat"
+      score: 5
+      description: "Execute program relative to directory"
+    - syscall: "memfd_create"
+      score: 15
+      description: "Create anonymous file (fileless malware)"
+
+  process:
+    - syscall: "clone"
+      score: 3
+      description: "Create child process"
+    - syscall: "fork"
+      score: 3
+      description: "Create child process"
+    - syscall: "vfork"
+      score: 3
+      description: "Create child process"
+
+  network:
+    - syscall: "socket"
+      score: 5
+      description: "Create socket"
+    - syscall: "connect"
+      score: 5
+      description: "Connect to remote"
+    - syscall: "bind"
+      score: 5
+      description: "Bind to port"
+    - syscall: "listen"
+      score: 5
+      description: "Listen for connections"
+
+network:
+  suspicious_tlds:
+    - ".shop"
+    - ".fun"
+    - ".xyz"
+    - ".top"
+    - ".club"
+    - ".online"
+    - ".site"
+    - ".work"
+    - ".click"
+    - ".link"
+    - ".gq"
+    - ".ml"
+    - ".cf"
+    - ".tk"
+    - ".ga"
+    - ".pw"
+    - ".cc"
+    - ".ws"
+
+  suspicious_endpoints:
+    - host: "api.telegram.org"
+      score: 20
+      description: "Telegram Bot API - часто C2 для stealers"
+    - host: "discord.com/api"
+      score: 15
+      description: "Discord webhooks - exfiltration"
+    - host: "pastebin.com"
+      score: 15
+      description: "Часто для payload hosting"
+    - host: "hastebin.com"
+      score: 15
+      description: "Payload hosting"
+    - host: "raw.githubusercontent.com"
+      score: 10
+      description: "Payload download"
+    - host: "ipinfo.io"
+      score: 10
+      description: "IP geolocation (reconnaissance)"
+    - host: "ip-api.com"
+      score: 10
+      description: "IP geolocation"
+    - host: "checkip.amazonaws.com"
+      score: 10
+      description: "External IP check"
+    - host: "ifconfig.me"
+      score: 10
+      description: "External IP check"
+
+  suspicious_paths:
+    - "/bot"
+    - "/sendMessage"
+    - "/sendDocument"
+    - "/api/webhooks"
+    - "/raw/"
+
+  suspicious_user_agents:
+    - pattern: "python-requests"
+      score: 10
+      description: "Default Python UA"
+    - pattern: "curl/"
+      score: 10
+      description: "curl default UA"
+    - pattern: "wget/"
+      score: 10
+      description: "wget default UA"
+    - pattern: "Go-http-client"
+      score: 10
+      description: "Go default UA"
+    - pattern: "Java/"
+      score: 10
+      description: "Java default UA"
+    - pattern: "Raven"
+      score: 20
+      description: "Raven Stealer signature"
+    - pattern: "Stealer"
+      score: 25
+      description: "Explicit stealer UA"
+    - pattern: "Bot"
+      score: 5
+      description: "Generic bot UA"
+
+filesystem:
+  critical_paths:
+    - path: "/etc"
+      score: 25
+      description: "System configuration"
+    - path: "/bin"
+      score: 25
+      description: "Essential binaries"
+    - path: "/usr/bin"
+      score: 25
+      description: "User binaries"
+    - path: "/sbin"
+      score: 25
+      description: "System binaries"
+    - path: "/lib"
+      score: 20
+      description: "Shared libraries"
+    - path: "/usr/lib"
+      score: 20
+      description: "User libraries"
+    - path: "/root"
+      score: 20
+      description: "Root home directory"
+    - path: "/home"
+      score: 15
+      description: "User home directories"
+    - path: "/tmp"
+      score: 5
+      description: "Temporary files"
+    - path: "/var/tmp"
+      score: 5
+      description: "Persistent temp files"
+
+  suspicious_patterns:
+    - pattern: "\\.bashrc$"
+      score: 20
+      description: "Bash startup file"
+    - pattern: "\\.bash_profile$"
+      score: 20
+      description: "Bash login file"
+    - pattern: "\\.profile$"
+      score: 20
+      description: "Shell profile"
+    - pattern: "\\.zshrc$"
+      score: 20
+      description: "Zsh startup file"
+    - pattern: "cron"
+      score: 20
+      description: "Cron job modification"
+    - pattern: "\\.service$"
+      score: 20
+      description: "Systemd service file"
+    - pattern: "\\.ssh/"
+      score: 25
+      description: "SSH directory"
+    - pattern: "authorized_keys"
+      score: 30
+      description: "SSH authorized keys"
+    - pattern: "id_rsa"
+      score: 30
+      description: "SSH private key"
+    - pattern: "passwd$"
+      score: 30
+      description: "Password file"
+    - pattern: "shadow$"
+      score: 30
+      description: "Shadow password file"
+    - pattern: "sudoers"
+      score: 30
+      description: "Sudo configuration"
+    - pattern: "^\\.[\\w]+"
+      score: 10
+      description: "Hidden file (starts with dot)"
+    - pattern: "\\.so$"
+      score: 15
+      description: "Shared library"
+    - pattern: "\\.so\\."
+      score: 15
+      description: "Versioned shared library"
+
+scripts:
+  python:
+    subprocess:
+      - pattern: "os\\.system\\s*\\("
+        score: 15
+        bandit_id: "B605"
+        description: "os.system call"
+      - pattern: "os\\.popen\\s*\\("
+        score: 15
+        bandit_id: "B605"
+        description: "os.popen call"
+      - pattern: "subprocess\\.call\\s*\\("
+        score: 15
+        bandit_id: "B602"
+        description: "subprocess.call"
+      - pattern: "subprocess\\.run\\s*\\("
+        score: 10
+        bandit_id: "B602"
+        description: "subprocess.run"
+      - pattern: "subprocess\\.Popen\\s*\\("
+        score: 15
+        bandit_id: "B602"
+        description: "subprocess.Popen"
+      - pattern: "commands\\.getoutput"
+        score: 15
+        bandit_id: "B605"
+        description: "commands.getoutput (deprecated)"
+
+    code_execution:
+      - pattern: "eval\\s*\\("
+        score: 20
+        bandit_id: "B307"
+        description: "eval() - arbitrary code execution"
+      - pattern: "exec\\s*\\("
+        score: 20
+        bandit_id: "B102"
+        description: "exec() - arbitrary code execution"
+      - pattern: "compile\\s*\\("
+        score: 15
+        bandit_id: "B102"
+        description: "compile() - code compilation"
+      - pattern: "__import__\\s*\\("
+        score: 10
+        description: "Dynamic import"
+
+    deserialization:
+      - pattern: "pickle\\.load"
+        score: 20
+        bandit_id: "B301"
+        description: "pickle deserialization (RCE risk)"
+      - pattern: "yaml\\.load\\s*\\([^)]*Loader"
+        score: 15
+        bandit_id: "B506"
+        description: "yaml.load without safe loader"
+      - pattern: "marshal\\.load"
+        score: 15
+        description: "marshal deserialization"
+
+    network:
+      - pattern: "socket\\.socket\\s*\\("
+        score: 10
+        description: "Socket creation"
+      - pattern: "\\.connect\\s*\\(\\s*\\("
+        score: 15
+        description: "Socket connect"
+      - pattern: "urllib\\.request\\.urlopen"
+        score: 10
+        description: "URL open"
+      - pattern: "requests\\.(get|post)\\s*\\("
+        score: 10
+        description: "HTTP request"
+
+    obfuscation:
+      - pattern: "base64\\.b64decode"
+        score: 10
+        description: "Base64 decode (possible obfuscation)"
+      - pattern: "codecs\\.decode.*rot"
+        score: 15
+        description: "ROT encoding"
+      - pattern: "zlib\\.decompress"
+        score: 10
+        description: "Compression (possible obfuscation)"
+
+    native:
+      - pattern: "ctypes\\.CDLL"
+        score: 20
+        description: "Load native library"
+      - pattern: "ctypes\\.windll"
+        score: 20
+        description: "Windows DLL access"
+      - pattern: "ctypes\\.WinDLL"
+        score: 20
+        description: "Windows DLL access"
+
+    suspicious_imports:
+      - "subprocess"
+      - "socket"
+      - "ctypes"
+      - "requests"
+      - "urllib"
+      - "paramiko"
+      - "ftplib"
+      - "smtplib"
+      - "telnetlib"
+
+  javascript:
+    subprocess:
+      - pattern: "require\\s*\\(\\s*['\"]child_process['\"]"
+        score: 15
+        description: "child_process import"
+      - pattern: "\\.exec\\s*\\("
+        score: 15
+        description: "exec() call"
+      - pattern: "\\.execSync\\s*\\("
+        score: 15
+        description: "execSync() call"
+      - pattern: "\\.spawn\\s*\\("
+        score: 15
+        description: "spawn() call"
+      - pattern: "\\.spawnSync\\s*\\("
+        score: 15
+        description: "spawnSync() call"
+
+    code_execution:
+      - pattern: "eval\\s*\\("
+        score: 20
+        description: "eval() - arbitrary code execution"
+      - pattern: "Function\\s*\\("
+        score: 20
+        description: "Function constructor"
+      - pattern: "new\\s+Function\\s*\\("
+        score: 20
+        description: "new Function()"
+      - pattern: "setTimeout\\s*\\([^,]+,"
+        score: 10
+        description: "setTimeout with string (eval-like)"
+      - pattern: "setInterval\\s*\\([^,]+,"
+        score: 10
+        description: "setInterval with string"
+
+    filesystem:
+      - pattern: "fs\\.writeFile"
+        score: 10
+        description: "File write"
+      - pattern: "fs\\.writeFileSync"
+        score: 10
+        description: "Sync file write"
+      - pattern: "fs\\.appendFile"
+        score: 10
+        description: "File append"
+      - pattern: "fs\\.unlink"
+        score: 10
+        description: "File delete"
+
+    network:
+      - pattern: "net\\.connect"
+        score: 15
+        description: "Network connect"
+      - pattern: "net\\.createConnection"
+        score: 15
+        description: "Create connection"
+      - pattern: "http\\.request"
+        score: 10
+        description: "HTTP request"
+      - pattern: "https\\.request"
+        score: 10
+        description: "HTTPS request"
+      - pattern: "axios\\."
+        score: 10
+        description: "Axios HTTP client"
+      - pattern: "fetch\\s*\\("
+        score: 10
+        description: "Fetch API"
+
+    obfuscation:
+      - pattern: "Buffer\\.from\\s*\\([^)]+,\\s*['\"]base64['\"]"
+        score: 10
+        description: "Base64 decode"
+      - pattern: "atob\\s*\\("
+        score: 10
+        description: "Base64 decode (browser)"
+
+  shell:
+    download:
+      - pattern: "curl\\s+"
+        score: 15
+        description: "curl download"
+      - pattern: "wget\\s+"
+        score: 15
+        description: "wget download"
+      - pattern: "curl.*\\|.*sh"
+        score: 30
+        description: "Pipe curl to shell (extremely dangerous)"
+      - pattern: "wget.*\\|.*sh"
+        score: 30
+        description: "Pipe wget to shell"
+
+    network:
+      - pattern: "nc\\s+-"
+        score: 20
+        description: "netcat"
+      - pattern: "ncat\\s+"
+        score: 20
+        description: "ncat"
+      - pattern: "/dev/tcp/"
+        score: 25
+        description: "Bash network redirection"
+      - pattern: "/dev/udp/"
+        score: 25
+        description: "Bash UDP redirection"
+
+    dangerous:
+      - pattern: "rm\\s+-rf\\s+/"
+        score: 30
+        description: "Recursive delete from root"
+      - pattern: ":\\(\\)\\{.*:\\|:&.*\\}\\;:"
+        score: 30
+        description: "Fork bomb"
+      - pattern: "dd\\s+if=.*of=/dev/"
+        score: 30
+        description: "Direct disk write"
+      - pattern: "mkfs\\."
+        score: 30
+        description: "Filesystem format"
+      - pattern: "> /dev/sd"
+        score: 30
+        description: "Direct disk overwrite"
+
+    code_execution:
+      - pattern: "eval\\s+"
+        score: 20
+        description: "eval in shell"
+      - pattern: "base64\\s+-d"
+        score: 10
+        description: "Base64 decode"
+      - pattern: "\\$\\(.*\\)"
+        score: 5
+        description: "Command substitution"
+
+    privilege:
+      - pattern: "chmod\\s+[0-7]*777"
+        score: 15
+        description: "World-writable permissions"
+      - pattern: "chmod\\s+\\+s"
+        score: 20
+        description: "SetUID bit"
+      - pattern: "chown\\s+root"
+        score: 15
+        description: "Change owner to root"
+
+    sensitive:
+      - pattern: "/etc/passwd"
+        score: 15
+        description: "passwd file access"
+      - pattern: "/etc/shadow"
+        score: 25
+        description: "shadow file access"
+      - pattern: "\\.ssh/"
+        score: 20
+        description: "SSH directory access"
+
+elf:
+  suspicious_imports:
+    - name: "setuid"
+      score: 30
+      mitre: "T1548"
+      description: "Change user ID - privilege escalation"
+    - name: "setreuid"
+      score: 30
+      mitre: "T1548"
+      description: "Set real/effective user ID"
+    - name: "setresuid"
+      score: 30
+      mitre: "T1548"
+      description: "Set real/effective/saved user ID"
+    - name: "setgid"
+      score: 25
+      mitre: "T1548"
+      description: "Change group ID"
+    - name: "setregid"
+      score: 25
+      mitre: "T1548"
+      description: "Set real/effective group ID"
+    - name: "ptrace"
+      score: 20
+      mitre: "T1055.008"
+      description: "Process tracing/debugging/injection"
+    - name: "process_vm_writev"
+      score: 20
+      mitre: "T1055"
+      description: "Write to another process memory"
+    - name: "process_vm_readv"
+      score: 15
+      mitre: "T1055"
+      description: "Read from another process memory"
+    - name: "mmap"
+      score: 5
+      mitre: "T1055"
+      description: "Memory mapping (potential code injection)"
+    - name: "mprotect"
+      score: 10
+      mitre: "T1055"
+      description: "Change memory protection (RWX)"
+    - name: "system"
+      score: 15
+      mitre: "T1059"
+      description: "Execute shell command"
+    - name: "execve"
+      score: 10
+      mitre: "T1059"
+      description: "Execute program"
+    - name: "execvp"
+      score: 10
+      mitre: "T1059"
+      description: "Execute program with PATH"
+    - name: "popen"
+      score: 15
+      mitre: "T1059"
+      description: "Open process pipe"
+    - name: "fork"
+      score: 5
+      mitre: "T1106"
+      description: "Create child process"
+    - name: "clone"
+      score: 5
+      mitre: "T1106"
+      description: "Create child process/thread"
+    - name: "socket"
+      score: 10
+      mitre: "T1071"
+      description: "Create network socket"
+    - name: "connect"
+      score: 10
+      mitre: "T1071"
+      description: "Connect to remote host"
+    - name: "bind"
+      score: 10
+      mitre: "T1071"
+      description: "Bind to port"
+    - name: "listen"
+      score: 10
+      mitre: "T1071"
+      description: "Listen for connections"
+    - name: "accept"
+      score: 10
+      mitre: "T1071"
+      description: "Accept incoming connection"
+    - name: "send"
+      score: 5
+      mitre: "T1041"
+      description: "Send data over network"
+    - name: "recv"
+      score: 5
+      mitre: "T1071"
+      description: "Receive data from network"
+    - name: "sendto"
+      score: 5
+      mitre: "T1041"
+      description: "Send UDP data"
+    - name: "recvfrom"
+      score: 5
+      mitre: "T1071"
+      description: "Receive UDP data"
+    - name: "getaddrinfo"
+      score: 5
+      mitre: "T1071.004"
+      description: "DNS resolution"
+    - name: "gethostbyname"
+      score: 5
+      mitre: "T1071.004"
+      description: "DNS resolution (legacy)"
+    - name: "unlink"
+      score: 5
+      mitre: "T1070.004"
+      description: "Delete file"
+    - name: "remove"
+      score: 5
+      mitre: "T1070.004"
+      description: "Delete file"
+    - name: "rename"
+      score: 5
+      mitre: "T1036"
+      description: "Rename file (potential masquerading)"
+    - name: "chmod"
+      score: 10
+      mitre: "T1222"
+      description: "Change file permissions"
+    - name: "chown"
+      score: 10
+      mitre: "T1222"
+      description: "Change file owner"
+    - name: "fchmod"
+      score: 10
+      mitre: "T1222"
+      description: "Change file permissions by fd"
+    - name: "init_module"
+      score: 25
+      mitre: "T1547.006"
+      description: "Load kernel module"
+    - name: "finit_module"
+      score: 25
+      mitre: "T1547.006"
+      description: "Load kernel module from fd"
+    - name: "delete_module"
+      score: 20
+      mitre: "T1547.006"
+      description: "Unload kernel module"
+    - name: "prctl"
+      score: 10
+      mitre: "T1622"
+      description: "Process control (anti-debug)"
+    - name: "getppid"
+      score: 5
+      mitre: "T1622"
+      description: "Get parent PID (anti-debug check)"
+    - name: "ioctl"
+      score: 5
+      mitre: "T1056"
+      description: "Device I/O control"
+    - name: "EVP_EncryptInit"
+      score: 10
+      mitre: "T1486"
+      description: "OpenSSL encryption init"
+    - name: "AES_encrypt"
+      score: 10
+      mitre: "T1486"
+      description: "AES encryption"
+
+  suspicious_strings:
+    - pattern: "http://"
+      score: 5
+      description: "HTTP URL"
+    - pattern: "https://"
+      score: 5
+      description: "HTTPS URL"
+    - pattern: "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"
+      score: 10
+      description: "IP address"
+    - pattern: "api\\.telegram\\.org"
+      score: 20
+      mitre: "T1102"
+      description: "Telegram API (C2)"
+    - pattern: "discord\\.com"
+      score: 15
+      mitre: "T1102"
+      description: "Discord (exfiltration)"
+    - pattern: "/bin/sh"
+      score: 10
+      mitre: "T1059.004"
+      description: "Shell path"
+    - pattern: "/bin/bash"
+      score: 10
+      mitre: "T1059.004"
+      description: "Bash path"
+    - pattern: "chmod\\s+[0-7]+"
+      score: 15
+      mitre: "T1222"
+      description: "chmod command"
+    - pattern: "/etc/cron"
+      score: 20
+      mitre: "T1053.003"
+      description: "Cron persistence"
+    - pattern: "\\.bashrc"
+      score: 20
+      mitre: "T1546.004"
+      description: "Bashrc modification"
+    - pattern: "/etc/systemd"
+      score: 20
+      mitre: "T1543.002"
+      description: "Systemd persistence"
+    - pattern: "/etc/init\\.d"
+      score: 20
+      mitre: "T1037"
+      description: "Init script persistence"
+    - pattern: "/etc/passwd"
+      score: 15
+      mitre: "T1003"
+      description: "Password file access"
+    - pattern: "/etc/shadow"
+      score: 25
+      mitre: "T1003"
+      description: "Shadow file access"
+    - pattern: "\\.ssh/id_"
+      score: 25
+      mitre: "T1552.004"
+      description: "SSH key access"
+    - pattern: "authorized_keys"
+      score: 25
+      mitre: "T1098.004"
+      description: "SSH authorized keys"
+    - pattern: "PTRACE_TRACEME"
+      score: 15
+      mitre: "T1622"
+      description: "Anti-debugging via ptrace"
+    - pattern: "LD_PRELOAD"
+      score: 15
+      mitre: "T1574.006"
+      description: "LD_PRELOAD hijacking"
+    - pattern: "/proc/self"
+      score: 5
+      mitre: "T1622"
+      description: "Process self-inspection"
+    - pattern: "UPX!"
+      score: 15
+      mitre: "T1027.002"
+      description: "UPX packer signature"
+    - pattern: "This file is packed"
+      score: 15
+      mitre: "T1027.002"
+      description: "Packer warning string"
+
+  suspicious_sections:
+    - name: ".upx"
+      score: 15
+      mitre: "T1027.002"
+      description: "UPX packer section"
+    - name: "UPX0"
+      score: 15
+      mitre: "T1027.002"
+      description: "UPX packer section"
+    - name: "UPX1"
+      score: 15
+      mitre: "T1027.002"
+      description: "UPX packer section"
+    - name: ".packed"
+      score: 15
+      mitre: "T1027.002"
+      description: "Generic packer section"
+
+  entropy_thresholds:
+    high: 7.5
+    medium: 6.5
+    score_high: 15
+    score_medium: 10
+    mitre: "T1027"
+
+  import_combinations:
+    - imports: ["socket", "connect", "fork"]
+      score: 25
+      mitre: "T1071"
+      description: "Network backdoor pattern"
+    - imports: ["ptrace", "fork"]
+      score: 25
+      mitre: "T1055.008"
+      description: "Process injection pattern"
+    - imports: ["mmap", "mprotect"]
+      score: 20
+      mitre: "T1055"
+      description: "Memory manipulation pattern"
+    - imports: ["setuid", "execve"]
+      score: 30
+      mitre: "T1548"
+      description: "Privilege escalation pattern"
+    - imports: ["socket", "dup2", "execve"]
+      score: 30
+      mitre: "T1059"
+      description: "Reverse shell pattern"

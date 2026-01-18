@@ -1,0 +1,46 @@
+
+paths:
+  images_dir: "vm_images"
+  sockets_dir: "/tmp/vm_sandbox"
+  logs_dir: "logs/vm"
+
+vm:
+  arm64:
+    image: "vm_images/ubuntu-arm64.qcow2"
+    ram: "4G"
+    cpus: 4
+    snapshot: "clean"
+    accel: "kvm"
+
+  x64:
+    image: "vm_images/ubuntu-x64.qcow2"
+    ram: "4G"
+    cpus: 2
+    snapshot: "clean"
+    accel: "tcg"
+
+anti_vm:
+  smbios_profile: "dell_optiplex"
+
+  mac_prefix: "D4:BE:D9"
+
+  disk_serial: "WD-WCAV"
+
+  hide_hypervisor: true
+
+  fake_sensors: true
+
+  user_artifacts: true
+
+timeouts:
+  vm_boot: 120
+  vm_boot_tcg: 1200
+  analysis: 60
+  snapshot_restore: 5
+  snapshot_restore_tcg: 60
+
+pool:
+  persistent: true
+  auto_warmup: true
+  warmup_timeout: 0
+  max_retries: 3

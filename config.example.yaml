@@ -1,0 +1,39 @@
+static:
+  yara_rules_dir: "yara_rules"
+  yara_custom_dir: "yara_rules/custom"
+
+  sqlite_path: "logs/incidents.db"
+
+  max_strings: 200
+  min_string_len: 6
+
+  virustotal_enabled: true
+  virustotal_api_key: ""
+  virustotal_timeout: 25
+  vt_min_positives: 1
+
+  clamav_unix_socket: "/var/run/clamav/clamd.ctl"
+  clamav_host: "127.0.0.1"
+  clamav_port: 3310
+  clamscan_bin: "clamscan"
+
+  yara_auto_rule_enabled: true
+  yara_auto_rule_min_score: 50
+
+  verdict:
+    clean: 15
+    suspicious: 30
+    malicious_threshold: 40
+    suspicious_threshold: 20
+
+scoring:
+  static:
+    yara_match: 10
+    clamav_infected: 30
+    vt_malicious_high: 25
+    vt_malicious_low: 15
+    suspicious_import: 5
+    packed: 10
+    source_ioc: 5
+    has_debug: -5
+    clean_bonus: 0

@@ -1,0 +1,200 @@
+profiles:
+  dell_optiplex:
+    description: "Dell OptiPlex 7080 Desktop"
+    type: desktop
+    bios:
+      vendor: "Dell Inc."
+      version: "A12"
+      date: "03/15/2023"
+    system:
+      manufacturer: "Dell Inc."
+      product: "OptiPlex 7080"
+      version: "1.0"
+      sku: "Desktop"
+      family: "OptiPlex"
+    board:
+      manufacturer: "Dell Inc."
+      product: "0X8DXD"
+      version: "A00"
+    chassis:
+      manufacturer: "Dell Inc."
+      type: 3
+      version: "1.0"
+    processor:
+      manufacturer: "Intel(R) Corporation"
+      version: "Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz"
+
+  dell_latitude:
+    description: "Dell Latitude 5520 Laptop"
+    type: laptop
+    bios:
+      vendor: "Dell Inc."
+      version: "1.15.0"
+      date: "05/10/2023"
+    system:
+      manufacturer: "Dell Inc."
+      product: "Latitude 5520"
+      version: "1.0"
+      sku: "Laptop"
+      family: "Latitude"
+    board:
+      manufacturer: "Dell Inc."
+      product: "0YWMR4"
+      version: "A00"
+    chassis:
+      manufacturer: "Dell Inc."
+      type: 10
+      version: "1.0"
+    processor:
+      manufacturer: "Intel(R) Corporation"
+      version: "11th Gen Intel(R) Core(TM) i5-1145G7 @ 2.60GHz"
+
+  hp_prodesk:
+    description: "HP ProDesk 400 G7 Desktop"
+    type: desktop
+    bios:
+      vendor: "HP"
+      version: "S14 Ver. 02.09.00"
+      date: "05/20/2023"
+    system:
+      manufacturer: "HP"
+      product: "HP ProDesk 400 G7 Small Form Factor"
+      version: "1.0"
+      sku: "8QY21AV"
+      family: "HP ProDesk"
+    board:
+      manufacturer: "HP"
+      product: "8767"
+      version: "KBC Version 08.60.00"
+    chassis:
+      manufacturer: "HP"
+      type: 3
+      version: "1.0"
+    processor:
+      manufacturer: "Intel(R) Corporation"
+      version: "Intel(R) Core(TM) i5-10500 CPU @ 3.10GHz"
+
+  hp_elitebook:
+    description: "HP EliteBook 840 G8 Laptop"
+    type: laptop
+    bios:
+      vendor: "HP"
+      version: "T76 Ver. 01.12.00"
+      date: "04/15/2023"
+    system:
+      manufacturer: "HP"
+      product: "HP EliteBook 840 G8 Notebook PC"
+      version: "1.0"
+      sku: "3C8F3EA#ABB"
+      family: "HP EliteBook"
+    board:
+      manufacturer: "HP"
+      product: "880D"
+      version: "KBC Version 51.30.00"
+    chassis:
+      manufacturer: "HP"
+      type: 10
+      version: "1.0"
+    processor:
+      manufacturer: "Intel(R) Corporation"
+      version: "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz"
+
+  lenovo_thinkcentre:
+    description: "Lenovo ThinkCentre M920q Mini PC"
+    type: desktop
+    bios:
+      vendor: "LENOVO"
+      version: "M3CKT49A"
+      date: "01/10/2023"
+    system:
+      manufacturer: "LENOVO"
+      product: "ThinkCentre M920q"
+      version: "ThinkCentre M920q"
+      sku: "10V8S04X00"
+      family: "ThinkCentre M920q Tiny"
+    board:
+      manufacturer: "LENOVO"
+      product: "313D"
+      version: "SDK0J40697 WIN"
+    chassis:
+      manufacturer: "LENOVO"
+      type: 35
+      version: "None"
+    processor:
+      manufacturer: "Intel(R) Corporation"
+      version: "Intel(R) Core(TM) i7-9700T CPU @ 2.00GHz"
+
+  lenovo_thinkpad:
+    description: "Lenovo ThinkPad T14 Gen 2i Laptop"
+    type: laptop
+    bios:
+      vendor: "LENOVO"
+      version: "N33ET69W (1.50)"
+      date: "06/01/2023"
+    system:
+      manufacturer: "LENOVO"
+      product: "ThinkPad T14 Gen 2i"
+      version: "ThinkPad T14 Gen 2i"
+      sku: "20W0CTO1WW"
+      family: "ThinkPad T14 Gen 2i"
+    board:
+      manufacturer: "LENOVO"
+      product: "20W0CTO1WW"
+      version: "SDK0J40697 WIN"
+    chassis:
+      manufacturer: "LENOVO"
+      type: 10
+      version: "None"
+    processor:
+      manufacturer: "Intel(R) Corporation"
+      version: "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz"
+
+  asus_rog:
+    description: "ASUS ROG STRIX Gaming Desktop"
+    type: desktop
+    bios:
+      vendor: "American Megatrends Inc."
+      version: "3801"
+      date: "02/22/2023"
+    system:
+      manufacturer: "ASUS"
+      product: "System Product Name"
+      version: "System Version"
+      sku: "SKU"
+      family: "ASUS_MB_CNL"
+    board:
+      manufacturer: "ASUSTeK COMPUTER INC."
+      product: "ROG STRIX Z490-E GAMING"
+      version: "Rev 1.xx"
+    chassis:
+      manufacturer: "Default string"
+      type: 3
+      version: "Default string"
+    processor:
+      manufacturer: "Intel(R) Corporation"
+      version: "Intel(R) Core(TM) i9-10900K CPU @ 3.70GHz"
+
+  msi_gaming:
+    description: "MSI Gaming Desktop"
+    type: desktop
+    bios:
+      vendor: "American Megatrends Inc."
+      version: "A.F0"
+      date: "03/01/2023"
+    system:
+      manufacturer: "MSI"
+      product: "MS-7C95"
+      version: "1.0"
+      sku: "To be filled by O.E.M."
+      family: "To be filled by O.E.M."
+    board:
+      manufacturer: "Micro-Star International Co., Ltd."
+      product: "MAG Z590 TOMAHAWK WIFI (MS-7C95)"
+      version: "1.0"
+    chassis:
+      manufacturer: "MSI"
+      type: 3
+      version: "1.0"
+    processor:
+      manufacturer: "Intel(R) Corporation"
+      version: "11th Gen Intel(R) Core(TM) i7-11700K @ 3.60GHz"

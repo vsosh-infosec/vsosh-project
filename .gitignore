@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+venv/
+.env
+logs/
+downloads/
+images/
+vm_images/
+mitre/enterprise-attack.json
+*.qcow2
+*.img
+*.iso
+*.zip
+*.elf
+*.mp3
+*.exe

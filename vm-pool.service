@@ -1,0 +1,22 @@
+
+[Unit]
+Description=Malware Sandbox VM Pool
+After=network.target
+
+[Service]
+Type=simple
+User=vsosh
+Group=kvm
+WorkingDirectory=/opt/project-vsosh
+Environment=PATH=/opt/project-vsosh/venv/bin:/usr/bin:/bin
+ExecStartPre=/bin/bash -c 'pkill -9 -f "qemu-system.*sandbox" || true; rm -f /tmp/vm_sandbox/*.sock || true; sleep 1'
+ExecStart=/opt/project-vsosh/venv/bin/python3 vm_pool_service.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+MemoryMax=2G
+
+[Install]
+WantedBy=multi-user.target
