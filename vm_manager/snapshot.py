@@ -1,7 +1,3 @@
-"""
-Snapshot Manager - Fast VM state save/restore for sandbox analysis
-"""
-
 import os
 import json
 import socket
@@ -17,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class SnapshotInfo:
-    """Information about a VM snapshot"""
     name: str
     vm_name: str
     created_at: float
@@ -26,22 +21,7 @@ class SnapshotInfo:
 
 
 class SnapshotManager:
-    """
-    Manages VM snapshots for fast state save/restore.
-    
-    Uses QEMU's internal snapshots (savevm/loadvm) for speed,
-    as they are stored within the qcow2 image and can be restored
-    in 1-3 seconds without full VM restart.
-    """
-    
     def __init__(self, socket_path: str, timeout: float = 60.0):
-        """
-        Initialize snapshot manager.
-        
-        Args:
-            socket_path: Path to QEMU QMP monitor socket
-            timeout: Default timeout for QMP operations
-        """
         self.socket_path = socket_path
         self._sock: Optional[socket.socket] = None
         self._timeout = timeout
@@ -79,7 +59,6 @@ class SnapshotManager:
         logger.debug(f"QMP capabilities: {caps_resp}")
     
     def _disconnect(self):
-        """Disconnect from QMP socket"""
         if self._sock:
             try:
                 self._sock.close()
@@ -88,12 +67,10 @@ class SnapshotManager:
             self._sock = None
     
     def _send(self, command: Dict[str, Any]):
-        """Send QMP command"""
         data = json.dumps(command) + '\n'
         self._sock.send(data.encode())
     
     def _recv(self, expect_greeting: bool = False) -> Dict[str, Any]:
-        """Receive QMP response"""
         buffer = b''
         while True:
             chunk = self._sock.recv(4096)
@@ -120,7 +97,6 @@ class SnapshotManager:
     
     def _execute(self, command: str, arguments: Optional[Dict] = None, 
                  timeout: Optional[float] = None) -> Dict[str, Any]:
-        """Execute a QMP command and return result"""
         with self._lock:
             old_timeout = self._timeout
             if timeout:
@@ -159,20 +135,6 @@ class SnapshotManager:
     
     def create_snapshot(self, name: str, description: str = "", 
                         timeout: float = 120.0) -> SnapshotInfo:
-        """
-        Create a VM snapshot (savevm).
-        
-        This saves the complete VM state (memory, CPU, devices) to
-        the qcow2 image. Takes 2-30 seconds depending on RAM size.
-        
-        Args:
-            name: Snapshot name
-            description: Optional description
-            timeout: Timeout for snapshot operation (default 120s for large RAM)
-            
-        Returns:
-            SnapshotInfo object
-        """
         logger.info(f"Creating snapshot: {name} (timeout={timeout}s)")
         start_time = time.time()
         
@@ -201,19 +163,6 @@ class SnapshotManager:
             raise
     
     def restore_snapshot(self, name: str, timeout: float = 60.0) -> float:
-        """
-        Restore a VM snapshot (loadvm).
-        
-        This restores the complete VM state from a snapshot.
-        Typically takes 1-5 seconds for live snapshots.
-        
-        Args:
-            name: Snapshot name to restore
-            timeout: Timeout for restore operation
-            
-        Returns:
-            Time taken in seconds
-        """
         logger.info(f"Restoring snapshot: {name} (timeout={timeout}s)")
         start_time = time.time()
         
@@ -235,7 +184,6 @@ class SnapshotManager:
             raise
     
     def delete_snapshot(self, name: str):
-        """Delete a VM snapshot"""
         logger.info(f"Deleting snapshot: {name}")
         
         try:
@@ -248,7 +196,6 @@ class SnapshotManager:
             raise
     
     def list_snapshots(self) -> List[SnapshotInfo]:
-        """List all snapshots for the VM"""
         try:
             result = self._execute('human-monitor-command', {
                 'command-line': 'info snapshots'
@@ -274,12 +221,10 @@ class SnapshotManager:
             return []
     
     def snapshot_exists(self, name: str) -> bool:
-        """Check if a snapshot exists"""
         snapshots = self.list_snapshots()
         return any(s.name == name for s in snapshots)
     
     def close(self):
-        """Close the snapshot manager"""
         self._disconnect()
     
     def __enter__(self):
@@ -290,35 +235,12 @@ class SnapshotManager:
 
 
 class ExternalSnapshotManager:
-    """
-    Alternative snapshot manager using external qcow2 snapshots.
-    
-    This approach creates a new overlay file for each analysis,
-    which can be faster for some use cases but uses more disk space.
-    """
-    
     def __init__(self, base_image: str, snapshots_dir: str):
-        """
-        Initialize external snapshot manager.
-        
-        Args:
-            base_image: Path to base qcow2 image
-            snapshots_dir: Directory for overlay files
-        """
         self.base_image = base_image
         self.snapshots_dir = snapshots_dir
         os.makedirs(snapshots_dir, exist_ok=True)
     
     def create_overlay(self, name: str) -> str:
-        """
-        Create a new overlay image based on the base image.
-        
-        Args:
-            name: Overlay name
-            
-        Returns:
-            Path to overlay image
-        """
         overlay_path = os.path.join(self.snapshots_dir, f"{name}.qcow2")
         
         cmd = [
@@ -335,17 +257,12 @@ class ExternalSnapshotManager:
         return overlay_path
     
     def delete_overlay(self, name: str):
-        """Delete an overlay image"""
         overlay_path = os.path.join(self.snapshots_dir, f"{name}.qcow2")
         if os.path.exists(overlay_path):
             os.unlink(overlay_path)
             logger.info(f"Deleted overlay: {overlay_path}")
     
     def commit_overlay(self, name: str):
-        """
-        Commit overlay changes to base image.
-        WARNING: This modifies the base image!
-        """
         overlay_path = os.path.join(self.snapshots_dir, f"{name}.qcow2")
         
         cmd = ['qemu-img', 'commit', overlay_path]
@@ -354,7 +271,6 @@ class ExternalSnapshotManager:
         logger.info(f"Committed overlay to base: {name}")
     
     def rebase_overlay(self, name: str, new_base: str):
-        """Rebase overlay to a new base image"""
         overlay_path = os.path.join(self.snapshots_dir, f"{name}.qcow2")
         
         cmd = [
@@ -368,7 +284,6 @@ class ExternalSnapshotManager:
         logger.info(f"Rebased overlay {name} to {new_base}")
     
     def get_overlay_info(self, name: str) -> Dict[str, Any]:
-        """Get information about an overlay image"""
         overlay_path = os.path.join(self.snapshots_dir, f"{name}.qcow2")
         
         cmd = ['qemu-img', 'info', '--output=json', overlay_path]
@@ -377,7 +292,6 @@ class ExternalSnapshotManager:
         return json.loads(result.stdout)
     
     def list_overlays(self) -> List[str]:
-        """List all overlay images"""
         overlays = []
         for f in os.listdir(self.snapshots_dir):
             if f.endswith('.qcow2'):
@@ -385,7 +299,6 @@ class ExternalSnapshotManager:
         return overlays
     
     def cleanup_old_overlays(self, max_age_hours: int = 24):
-        """Remove overlay files older than specified hours"""
         import time
         cutoff = time.time() - (max_age_hours * 3600)
         
